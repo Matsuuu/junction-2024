@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import { pingProducer } from "./src/kafka";
 
 const app = express();
 const port = 3000;
@@ -11,7 +12,20 @@ app.get("/", (req, res) => {
 });
 
 app.get("/ping", (req, res) => {
-  res.send({ pong: "pong" });
+  const timestamp = new Date().toUTCString();
+  pingProducer.send({
+    topic: "matsu",
+    messages: [
+      {
+        value: JSON.stringify({
+          msg: "Ping endpoint called",
+          timestamp,
+        }),
+      },
+    ],
+  });
+  console.log("Submitted to topic");
+  res.send({ pong: timestamp });
 });
 
 app.listen(port, () => {

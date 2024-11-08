@@ -4,8 +4,10 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "concurrently \"npm run build:watch\" \"node dist/index.js\"",
-    "build:watch": "node esbuild.js"
+    "start": "concurrently \"npm run build:watch\" \"npm run serve\"",
+    "build": "node esbuild.js",
+    "build:watch": "node esbuild.watch.js",
+    "serve": "node --watch dist/index.js"
   },
   "keywords": [],
   "author": "",
@@ -15,6 +17,7 @@
     "cors": "^2.8.5",
     "express": "^4.21.1",
     "jwt-decode": "^4.0.0",
+    "kafkajs": "^2.2.4",
     "kysely": "^0.27.4",
     "pg": "^8.13.1"
   },

@@ -1,6 +1,6 @@
 import * as esbuild from "esbuild";
 
-await esbuild.build({
+const ctx = await esbuild.context({
   entryPoints: ["index.ts"],
   platform: "node",
   format: "esm",
@@ -8,3 +8,6 @@ await esbuild.build({
   outdir: "dist",
   packages: "external",
 });
+
+console.log("watching...");
+await ctx.watch();
