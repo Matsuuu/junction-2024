@@ -1,4 +1,6 @@
+import { getLocation } from "./location.js";
 import "./thatopen.js";
+import "./location-watcher.js";
 
 const API_URL = "http://100.121.173.96:3000";
 console.log("Foo");
@@ -9,4 +11,6 @@ async function ping() {
   document.body.innerHTML += JSON.stringify(result);
 }
 
-// ping();
+getLocation().then((location) => {
+  console.log("LOC", location);
+});
