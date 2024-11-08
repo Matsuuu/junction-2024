@@ -15,8 +15,14 @@
   "description": "",
   "dependencies": {
     "@shoelace-style/shoelace": "^2.18.0",
+    "@thatopen/components": "^2.3.16",
+    "@thatopen/fragments": "^2.3.0",
+    "install": "^0.13.0",
     "lit": "^3.2.1",
-    "suunta": "^2.3.2"
+    "npm": "^10.9.0",
+    "suunta": "^2.3.2",
+    "three": "^0.160.1",
+    "tinycolor2": "^1.6.0"
   },
   "devDependencies": {
     "vite": "^5.4.10"
