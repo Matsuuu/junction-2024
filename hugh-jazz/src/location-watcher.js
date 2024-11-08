@@ -13,13 +13,31 @@ export class LocationWatcher extends LitElement {
     super();
     this.latitude = 0;
     this.longitude = 0;
+    window.__LOCATION_WATCHER = this;
+  }
+
+  get position() {
+    return { lat: this.latitude, lng: this.longitude };
+  }
+
+  updated(_changedProperties) {
+    if (
+      _changedProperties.has("latitude") ||
+      _changedProperties.has("longitude")
+    ) {
+      this.dispatchEvent(
+        new CustomEvent("location-updated", {
+          detail: { location: this.position },
+        }),
+      );
+      window.__DIAG.location = this.position;
+    }
   }
 
   async firstUpdated() {
     await Geolocation.watchPosition(
       { enableHighAccuracy: true },
       (location) => {
-        console.log("Watch: ", location);
         this.latitude = location.coords.latitude;
         this.longitude = location.coords.longitude;
       },

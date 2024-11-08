@@ -23,17 +23,18 @@ const fragmentIfcLoader = components.get(OBC.IfcLoader);
 fragmentIfcLoader.setup();
 
 async function initThatOpen() {
-  const location = await getLocation();
-
   world.scene = new OBC.SimpleScene(components);
+  // @ts-ignore
   world.renderer = new OBC.SimpleRenderer(components, container);
 
   const camera = (world.camera = new OBC.SimpleCamera(components));
 
   components.init();
 
+  // @ts-ignore
   world.scene.setup();
 
+  // @ts-ignore
   world.scene.three.background = null;
 }
 
@@ -61,6 +62,31 @@ async function loadIfc() {
 
   let previousSelection = null;
   let previousMaterial = null;
+
+  let referenceLocation = undefined;
+
+  window.__LOCATION_WATCHER.addEventListener(
+    "location-updated",
+    (/** @type { CustomEvent } */ event) => {
+      const location = event.detail.location;
+      if (!referenceLocation && location.lat > 0) {
+        referenceLocation = location;
+      }
+      /** @type {{ lat: number, lng: number }} */
+      console.log("Updated");
+      const diff = {
+        lat: referenceLocation.lat - location.lat,
+        lng: referenceLocation.lng - location.lng,
+      };
+
+      console.log("Diff to start position: ", diff);
+
+      const scaledDiff = { z: diff.lat * 100, x: diff.lng * 100 };
+
+      window.__DIAG.diff = diff;
+      window.__DIAG.scaledDiff = scaledDiff;
+    },
+  );
 
   window.onmousemove = () => {
     const result = caster.castRay([model]);
