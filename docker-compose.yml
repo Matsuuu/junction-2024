@@ -1,0 +1,20 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_volume:/var/lib/postgresql/data
+    networks:
+      - hugh-winnings
+    environment:
+      POSTGRES_PASSWORD: hughmungus
+
+volumes:
+  postgres_volume:
+
+networks:
+  hugh-winnings:
+    driver: bridge
