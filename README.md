@@ -2,7 +2,11 @@
 
 App:
 
-http://100.121.173.96:5173/
+http://raindrop:8000/
+
+Api:
+
+http://raindrop:3000/
 
 Kafka:
 
