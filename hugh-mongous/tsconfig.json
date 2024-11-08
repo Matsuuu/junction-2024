@@ -1,0 +1,29 @@
+{
+    "compilerOptions": {
+        "checkJs": true,
+        "target": "esnext",
+        "module": "esnext",
+        "moduleResolution": "node",
+        "skipLibCheck": true,
+        "lib": ["esnext"],
+
+        "outDir": "dist",
+        "sourceMap": true,
+        "declaration": true,
+
+        "allowSyntheticDefaultImports": true,
+
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitAny": true,
+        "noImplicitThis": true,
+        "strictBindCallApply": true,
+        "strictNullChecks": true,
+        "strictPropertyInitialization": true,
+        "stripInternal": true,
+        "noErrorTruncation": true,
+
+        "typeRoots": ["node_modules/@types", "types"]
+    },
+    "include": ["src/**/*.ts", "src/**/*.js", "esbuild.js"],
+    "exclude": ["node_modules", "dist"]
+}
