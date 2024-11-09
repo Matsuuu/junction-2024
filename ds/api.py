@@ -101,5 +101,6 @@ if __name__ == "__main__":
     # curl -X POST -F file=@ml/images/20200124_091405.jpg localhost:5000
 
     app.secret_key = 'super secret key'
+    app.config['MAX_CONTENT_LENGTH'] = 16 * 1000 * 1000 * 10
     app.run(debug=True,
             host="0.0.0.0")
