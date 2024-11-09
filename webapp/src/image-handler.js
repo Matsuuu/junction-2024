@@ -1,4 +1,5 @@
 import { css, html, LitElement } from "lit";
+import { compressImage } from "./img";
 
 export class ImageHandler extends LitElement {
     static get properties() {
@@ -9,9 +10,6 @@ export class ImageHandler extends LitElement {
 
     constructor() {
         super();
-        this.videoHeight = 0;
-        this.videoWidth = 400;
-
         this.currentImage = undefined;
 
         this.isDrawing = false;
@@ -43,23 +41,20 @@ export class ImageHandler extends LitElement {
         this.video.addEventListener(
             "canplay",
             ev => {
-                const width = 400;
-                this.videoHeight = (this.video.videoHeight / this.video.videoWidth) * this.videoWidth;
-                //this.videoHeight = 0.75 * width;
+                const videoWidth = this.video.clientWidth;
+                const videoHeight = this.video.clientHeight;
 
-                this.video.setAttribute("width", this.videoWidth + "");
-                this.video.setAttribute("height", this.videoHeight + "");
-                this.imageCanvas.setAttribute("width", this.videoWidth + "");
-                this.imageCanvas.setAttribute("height", this.videoHeight + "");
-                this.drawingCanvas.setAttribute("width", this.videoWidth + "");
-                this.drawingCanvas.setAttribute("height", this.videoHeight + "");
+                this.imageCanvas.setAttribute("width", videoWidth + "");
+                this.imageCanvas.setAttribute("height", videoHeight + "");
+                this.drawingCanvas.setAttribute("width", videoWidth + "");
+                this.drawingCanvas.setAttribute("height", videoHeight + "");
             },
             false,
         );
 
         const stream = await navigator.mediaDevices
             .getUserMedia({
-                video: true,
+                video: { facingMode: "environment" },
                 audio: false,
             })
             .catch(ex => console.error(ex));
@@ -69,17 +64,23 @@ export class ImageHandler extends LitElement {
         }
     }
 
+    get videoHeight() {
+        return this.video.clientHeight;
+    }
+
+    get videoWidth() {
+        return this.video.clientWidth;
+    }
+
     takePhoto() {
         const canvas = this.shadowRoot.querySelector("canvas");
         const video = this.shadowRoot.querySelector("video");
-        const photo = this.shadowRoot.querySelector("img");
 
         const context = canvas.getContext("2d");
         if (this.videoWidth && this.videoHeight) {
             context.drawImage(video, 0, 0, this.videoWidth, this.videoHeight);
 
             const data = canvas.toDataURL("image/png");
-            photo.setAttribute("src", data);
             this.currentImage = data;
         }
     }
@@ -131,7 +132,7 @@ export class ImageHandler extends LitElement {
      * @param {TouchEvent} e
      */
     onTouchEnd(e) {
-        const touch = e.touches[0];
+        const touch = e.changedTouches[0];
         this.onCanvasDrawEnd(touch.clientX, touch.clientY, /** @type { HTMLElement } */ (e.target));
     }
 
@@ -212,15 +213,58 @@ export class ImageHandler extends LitElement {
         };
     }
 
+    submitPhoto() {
+        const compressedImage = this.imageCanvas.toDataURL("image/jpeg", 0.3);
+
+        this.dispatchEvent(
+            new CustomEvent("submit-photo", {
+                detail: {
+                    photo: compressedImage,
+                    ...this.drawedRect,
+                },
+                bubbles: true,
+            }),
+        );
+    }
+
+    /**
+     * @param {InputEvent} e
+     */
+    async onFileUpload(e) {
+        const file = e.target.files[0];
+
+        const reader = new FileReader();
+
+        reader.onload = () => {
+            const fileUrl = reader.result;
+            console.log("KLAJSDJAKSDJAKSDJKASD");
+
+            const ctx = this.imageCanvas.getContext("2d");
+
+            const image = new Image();
+            image.onload = () => {
+                const widthRatio = image.width / this.videoWidth;
+
+                const imageWidth = this.videoWidth;
+                const imageHeight = image.height / widthRatio;
+
+                // Resize image to fit. THen we can use that image to make the actual shippable img
+                ctx.drawImage(image, 0, 0, imageWidth, imageHeight);
+
+                this.currentImage = this.imageCanvas.toDataURL(file.type);
+            };
+            image.src = fileUrl;
+        };
+
+        //const compressedFile = await compressImage(file, { quality: 0.5 });
+        reader.readAsDataURL(file);
+    }
+
     render() {
         return html`
             <div class="camera">
-                <video>Loading video source...</video>
-
-                <div class="camera-controls">
-                    ${this.currentImage
-                        ? html` <button @click=${this.clearPhoto}>Clear photo</button> `
-                        : html` <button @click=${this.takePhoto}>Take a photo</button> `}
+                <div class="video-wrapper">
+                    <video ?hidden=${this.currentImage}>Loading video source...</video>
                 </div>
             </div>
 
@@ -237,8 +281,17 @@ export class ImageHandler extends LitElement {
                 ></canvas>
             </div>
 
-            <div class="output-image">
-                <img style="display: none" />
+            <div class="camera-controls">
+                ${this.currentImage
+                    ? html`
+                          <button @click=${this.clearPhoto}>Clear photo</button>
+                          <button @click=${this.submitPhoto}>Submit photo</button>
+                      `
+                    : html` <button @click=${this.takePhoto}>Take a photo</button>
+                          <label>
+                              Or upload a file from your phone
+                              <input type="file" @change=${this.onFileUpload} />
+                          </label>`}
             </div>
         `;
     }
@@ -249,16 +302,29 @@ export class ImageHandler extends LitElement {
                 display: flex;
                 width: 100%;
                 position: relative;
+                height: 100%;
             }
 
             .camera {
                 display: flex;
+                flex-direction: column;
                 width: 100%;
             }
 
+            .video-wrapper {
+                width: 100%;
+            }
             .camera-controls {
+                position: absolute;
+                bottom: 1rem;
+                background: #fff;
                 display: flex;
-                flex-direction: column;
+                padding: 1rem;
+                width: 100%;
+                z-index: 100;
+                justify-content: space-between;
+                gap: 2rem;
+                box-sizing: border-box;
             }
 
             .editing-canvas {
@@ -277,7 +343,8 @@ export class ImageHandler extends LitElement {
             }
 
             *[hidden] {
-                visibility: hidden;
+                opacity: 0;
+                pointer-events: none;
             }
         `;
     }

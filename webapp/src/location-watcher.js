@@ -11,6 +11,7 @@ export class LocationWatcher extends LitElement {
 
     constructor() {
         super();
+        this.DEBUG = false;
         this.latitude = 0;
         this.longitude = 0;
 
@@ -62,6 +63,9 @@ export class LocationWatcher extends LitElement {
     }
 
     render() {
+        if (!this.DEBUG) {
+            return "";
+        }
         return html`
             <ul>
                 <li>Lat: ${this.latitude}</li>
