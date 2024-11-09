@@ -1,0 +1,6 @@
+confluent-kafka==2.6.0
+pillow==11.0.0
+protobuf==5.28.3
+Flask==3.0.3
+psycopg-binary==3.2.3
+loguru==0.7.2
