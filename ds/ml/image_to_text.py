@@ -78,7 +78,7 @@ def image_to_text(image_path: str,
     pad_color = img[0,0,:]
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-    _, thresh1 = cv2.threshold(gray, 0, 255, cv2.THRESH_OTSU | cv2.THRESH_BINARY)
+    _, thresh1 = cv2.threshold(gray, 0, 255, cv2.THRESH_OTSU | cv2.THRESH_TOZERO)
 
     im2 = img.copy()
 
@@ -87,7 +87,7 @@ def image_to_text(image_path: str,
     # cropped = im2[y:y + h, x:x + w]
     logger.info(f"Cropping with x={x} y={y} w={w} h={h}")
     cropped = thresh1[y:y + h, x:x + w]
-    show_wait_close(cv2.resize(cropped, (800,800)))
+    # show_wait_close(cv2.resize(cropped, (800,800)))
 
     # 1 3 4
     custom_oem_psm_config = r'--oem 1 --psm 1'
@@ -97,6 +97,9 @@ def image_to_text(image_path: str,
     rows = text_to_rows(text)
     info_dict = {"others": []}
     for row in rows:
+        if len(row.split("/Project ")) == 2:
+            k, v = row.split("/Project ")
+            info_dict[k] = v
         if len(row.split(":")) == 2:
             k, v = row.split(":")
             info_dict[k] = v
@@ -118,7 +121,7 @@ def image_to_text(image_path: str,
     print("DUMP")
     print(text.strip())
 
-    show_wait_close(cv2.resize(im2, (800,800)))
+    # show_wait_close(cv2.resize(im2, (800,800)))
 
     logger.info(f"Uploading {image_path.split('/')[-1]} results to DB")
     upload_imagetext_to_db(image_path.split("/")[-1], info_dict, image_path)
