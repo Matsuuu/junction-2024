@@ -310,6 +310,7 @@ export class ImageHandler extends LitElement {
         if (res.ok) {
             // TODO: Send to DB
             this.clearAll();
+            document.querySelector("ifc-element").loadItems();
         }
     }
 

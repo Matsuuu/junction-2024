@@ -178,6 +178,8 @@ export class IfcElement extends LitElement {
     async loadItems() {
         const response = await fetch(API_URL() + "/items").then(res => res.json());
 
+        cubes.forEach(cube => cube.remove());
+
         console.log(response);
         const lastItem = response.items.at(-1);
         console.log("Last:", lastItem);
