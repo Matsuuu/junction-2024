@@ -279,6 +279,10 @@ export class ImageHandler extends LitElement {
         event.preventDefault();
 
         // TODO: Send to DB
+        this.clearAll();
+    }
+
+    clearAll() {
         this.imageResults = undefined;
         this.clearPhoto();
     }
@@ -341,6 +345,7 @@ export class ImageHandler extends LitElement {
                           )}
 
                           <sl-button type="submit" variant="primary">Submit</sl-button>
+                          <sl-button @click=${this.clearAll} variant="danger">Cancel</sl-button>
                       </form>
                   `}
         `;
