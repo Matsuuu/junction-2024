@@ -303,16 +303,27 @@ export class ImageHandler extends LitElement {
                 width: 100%;
                 position: relative;
                 height: 100%;
+                flex-direction: column;
+                align-items: center;
             }
 
             .camera {
                 display: flex;
                 flex-direction: column;
                 width: 100%;
+                height: 80%;
             }
 
             .video-wrapper {
                 width: 100%;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            video {
+                height: 100%;
             }
             .camera-controls {
                 position: absolute;
@@ -330,6 +341,7 @@ export class ImageHandler extends LitElement {
             .editing-canvas {
                 position: absolute;
                 top: 0;
+                left: 0;
             }
 
             .editing-canvas * {
