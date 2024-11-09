@@ -221,7 +221,7 @@ export class ImageHandler extends LitElement {
     }
 
     submitPhoto() {
-        const compressedImage = this.imageCanvas.toDataURL("image/jpeg", 0.3);
+        const compressedImage = this.imageCanvas.toDataURL("image/webp", 1);
 
         this.dispatchEvent(
             new CustomEvent("submit-photo", {
@@ -242,13 +242,17 @@ export class ImageHandler extends LitElement {
         };
 
         this.requestUpdate();
+
+        setTimeout(() => {
+            this.shadowRoot.querySelector(".image-results").scrollTo({ behavior: "smooth" });
+        }, 100);
     }
 
     /**
      * @param {InputEvent} e
      */
     async onFileUpload(e) {
-        const file = e.target.files[0];
+        const file = e.target.input.files[0];
 
         const reader = new FileReader();
 
@@ -337,6 +341,7 @@ export class ImageHandler extends LitElement {
                     @touchstart=${this.onTouchStart}
                     @touchmove=${this.onTouchMove}
                     @touchend=${this.onTouchEnd}
+                    ?no-pointer=${this.imageResults}
                 ></canvas>
             </div>
 
@@ -353,7 +358,7 @@ export class ImageHandler extends LitElement {
                                         <sl-icon library="fa" name="fas-camera"></sl-icon>
                                     </sl-button>
 
-                                    <sl-input type="file">
+                                    <sl-input type="file" @sl-change=${this.onFileUpload}>
                                         <sl-icon slot="prefix" library="fa" name="fas-file-arrow-up"></sl-icon>
                                     </sl-input>
                                 `}
@@ -445,6 +450,10 @@ export class ImageHandler extends LitElement {
 
             *[hidden] {
                 opacity: 0;
+                pointer-events: none;
+            }
+
+            *[no-pointer] {
                 pointer-events: none;
             }
 

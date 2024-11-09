@@ -4,6 +4,7 @@ import "./ifc-element.js";
 import { sendDiagnostics } from "./diag.js";
 import { registerIconLibrary, setBasePath } from "@shoelace-style/shoelace";
 import "@shoelace-style/shoelace/dist/shoelace.js";
+import { FILE_API_URL } from "./request.js";
 
 window.__DIAG = {};
 
@@ -20,22 +21,22 @@ document.addEventListener("submit-photo", async (/** @type { CustomEvent } */ e)
     formData.set("w", e.detail.w ?? 100);
     formData.set("h", e.detail.h ?? 10);
 
-    // const result = await fetch(`${FILE_API_URL()}/file-coordinates`, {
-    //     method: "POST",
-    //     body: formData,
-    // }).then(res => res.json());
+    const result = await fetch(`${FILE_API_URL()}/file-coordinates`, {
+        method: "POST",
+        body: formData,
+    }).then(res => res.json());
 
-    const testResult = {
-        others: ["Mukulaku ja 3, FIN-04300 Tuusula"],
-        Tel: " +358-9-274 4000, Fax +358-9-274 40044",
-        "Projekti / Project": " 18817",
-        "Pvm/Date": " 19.06.2006",
-        Tyyppi: " RECAIR 6E",
-        Konetunnus: " TK1",
-        "Ilmavirta (m3/s)": " 7.2",
-    };
+    // const testResult = {
+    //     others: ["Mukulaku ja 3, FIN-04300 Tuusula"],
+    //     Tel: " +358-9-274 4000, Fax +358-9-274 40044",
+    //     "Projekti / Project": " 18817",
+    //     "Pvm/Date": " 19.06.2006",
+    //     Tyyppi: " RECAIR 6E",
+    //     Konetunnus: " TK1",
+    //     "Ilmavirta (m3/s)": " 7.2",
+    // };
 
-    const { others, ...foundResults } = testResult;
+    const { others, ...foundResults } = result;
 
     document.querySelector("image-handler").setImageResults({ others, foundResults });
 });

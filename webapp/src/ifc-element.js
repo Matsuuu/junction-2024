@@ -208,9 +208,18 @@ export class IfcElement extends LitElement {
             ${this.selectedItem
                 ? html`
                       <div class="selected-item">
-                          ${[...Object.entries(this.selectedItem)].map(
-                              ([key, value]) => html` <p><span>${key}:</span> ${value}</p> `,
-                          )}
+                          ${[...Object.entries(this.selectedItem)].map(([key, value]) => {
+                              if (key === "metadata") {
+                                  console.log(value);
+                                  if (!value) {
+                                      return "";
+                                  }
+                                  return [...Object.entries(value)].map(
+                                      ([key, value]) => html`<p><span>${key}:</span>${value}</p>`,
+                                  );
+                              }
+                              return html` <p><span>${key}:</span> ${value}</p> `;
+                          })}
                       </div>
                   `
                 : ""}
