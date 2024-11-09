@@ -1,5 +1,7 @@
 import { css, html, LitElement } from "lit";
-import { compressImage } from "./img";
+import "@shoelace-style/shoelace/dist/components/button/button.js";
+import "@shoelace-style/shoelace/dist/components/icon/icon.js";
+import "@shoelace-style/shoelace/dist/components/input/input.js";
 
 export class ImageHandler extends LitElement {
     static get properties() {
@@ -16,6 +18,8 @@ export class ImageHandler extends LitElement {
 
         this.rectStart = undefined;
         this.drawedRect = undefined;
+
+        this.imageResults = undefined;
     }
 
     firstUpdated() {
@@ -48,6 +52,8 @@ export class ImageHandler extends LitElement {
                 this.imageCanvas.setAttribute("height", videoHeight + "");
                 this.drawingCanvas.setAttribute("width", videoWidth + "");
                 this.drawingCanvas.setAttribute("height", videoHeight + "");
+
+                this.video.parentElement.style.height = videoHeight + "px";
             },
             false,
         );
@@ -227,6 +233,16 @@ export class ImageHandler extends LitElement {
         );
     }
 
+    setImageResults({ others, foundResults }) {
+        console.log("Setting image results");
+        this.imageResults = {
+            others: others ?? [],
+            foundResults: foundResults ?? {},
+        };
+
+        this.requestUpdate();
+    }
+
     /**
      * @param {InputEvent} e
      */
@@ -237,7 +253,6 @@ export class ImageHandler extends LitElement {
 
         reader.onload = () => {
             const fileUrl = reader.result;
-            console.log("KLAJSDJAKSDJAKSDJKASD");
 
             const ctx = this.imageCanvas.getContext("2d");
 
@@ -258,6 +273,14 @@ export class ImageHandler extends LitElement {
 
         //const compressedFile = await compressImage(file, { quality: 0.5 });
         reader.readAsDataURL(file);
+    }
+
+    onFoundResultsSubmit(event) {
+        event.preventDefault();
+
+        // TODO: Send to DB
+        this.imageResults = undefined;
+        this.clearPhoto();
     }
 
     render() {
@@ -281,18 +304,43 @@ export class ImageHandler extends LitElement {
                 ></canvas>
             </div>
 
-            <div class="camera-controls">
-                ${this.currentImage
-                    ? html`
-                          <button @click=${this.clearPhoto}>Clear photo</button>
-                          <button @click=${this.submitPhoto}>Submit photo</button>
-                      `
-                    : html` <button @click=${this.takePhoto}>Take a photo</button>
-                          <label>
-                              Or upload a file from your phone
-                              <input type="file" @change=${this.onFileUpload} />
-                          </label>`}
-            </div>
+            ${!this.imageResults
+                ? html`
+                      <div class="camera-controls">
+                          ${this.currentImage
+                              ? html`
+                                    <sl-button @click=${this.clearPhoto}>Clear photo</sl-button>
+                                    <sl-button @click=${this.submitPhoto}>Submit photo</sl-button>
+                                `
+                              : html`
+                                    <sl-button id="take-photo" @click=${this.takePhoto}>
+                                        <sl-icon library="fa" name="fas-camera"></sl-icon>
+                                    </sl-button>
+
+                                    <sl-input type="file">
+                                        <sl-icon slot="prefix" library="fa" name="fas-file-arrow-up"></sl-icon>
+                                    </sl-input>
+                                `}
+                      </div>
+                  `
+                : html`
+                      <form class="image-results" @submit=${this.onFoundResultsSubmit}>
+                          <p>Found matches:</p>
+                          ${[...Object.entries(this.imageResults.foundResults)].map(
+                              ([key, value]) => html`
+                                  <sl-input label="${key}" type="text" value="${value}"></sl-input>
+                              `,
+                          )}
+
+                          <p>Metadata</p>
+
+                          ${this.imageResults.others.map(
+                              other => html` <sl-input type="text" value="${other}"></sl-input> `,
+                          )}
+
+                          <sl-button type="submit" label="" variant="primary">Submit</sl-button>
+                      </form>
+                  `}
         `;
     }
 
@@ -311,7 +359,6 @@ export class ImageHandler extends LitElement {
                 display: flex;
                 flex-direction: column;
                 width: 100%;
-                height: 80%;
             }
 
             .video-wrapper {
@@ -324,6 +371,7 @@ export class ImageHandler extends LitElement {
 
             video {
                 height: 100%;
+                width: 100%;
             }
             .camera-controls {
                 position: absolute;
@@ -357,6 +405,38 @@ export class ImageHandler extends LitElement {
             *[hidden] {
                 opacity: 0;
                 pointer-events: none;
+            }
+
+            .image-results {
+                display: flex;
+                flex-direction: column;
+                width: 100%;
+                gap: 0.5rem;
+                font-size: 1.6rem;
+                margin-top: 2rem;
+                padding: 1rem;
+                box-sizing: border-box;
+            }
+
+            .image-results p {
+                font-weight: bold;
+            }
+
+            .image-results input {
+                font-size: 1.6rem;
+            }
+
+            sl-input[type="file"]::part(input) {
+                opacity: 0;
+            }
+
+            sl-icon {
+                color: #000;
+            }
+
+            .camera-controls #take-photo,
+            .camera-controls sl-input {
+                width: 3rem;
             }
         `;
     }
