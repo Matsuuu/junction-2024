@@ -2,6 +2,7 @@ import { css, html, LitElement } from "lit";
 import "@shoelace-style/shoelace/dist/components/button/button.js";
 import "@shoelace-style/shoelace/dist/components/icon/icon.js";
 import "@shoelace-style/shoelace/dist/components/input/input.js";
+import { API_URL } from "./request";
 
 export class ImageHandler extends LitElement {
     static get properties() {
@@ -275,11 +276,35 @@ export class ImageHandler extends LitElement {
         reader.readAsDataURL(file);
     }
 
-    onFoundResultsSubmit(event) {
+    async onFoundResultsSubmit(event) {
         event.preventDefault();
 
-        // TODO: Send to DB
-        this.clearAll();
+        const formData = new FormData(event.target);
+
+        const metadata = [...formData.entries()].reduce((acc, [key, value]) => {
+            acc[key] = value;
+            return acc;
+        }, {});
+
+        const payload = {
+            sku: formData.get("sku"),
+            name: formData.get("name"),
+            lat: window.__LOCATION_WATCHER.position.lat,
+            lon: window.__LOCATION_WATCHER.position.lng,
+            status: "available",
+            metadata,
+        };
+
+        const res = await fetch(API_URL() + "/submit", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+        });
+
+        if (res.ok) {
+            // TODO: Send to DB
+            this.clearAll();
+        }
     }
 
     clearAll() {
@@ -330,7 +355,9 @@ export class ImageHandler extends LitElement {
                 : html`
                       <form class="image-results" @submit=${this.onFoundResultsSubmit}>
                           <p>Required information:</p>
+                          <sl-input label="SKU" type="text" name="sku"></sl-input>
                           <sl-input label="Name" type="text" name="name"></sl-input>
+                          <sl-input label="Quantity" type="number" name="quantity"></sl-input>
                           <p>Found matches:</p>
                           ${[...Object.entries(this.imageResults.foundResults)].map(
                               ([key, value]) => html`
