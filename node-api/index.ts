@@ -12,6 +12,10 @@ app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
+app.get("/diag", (req, res) => {
+  res.send({ msg: "This is the diag endpoint. Please use POST" });
+});
+
 app.post("/diag", (req, res) => {
   console.log(req.body);
   res.send();

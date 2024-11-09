@@ -1,9 +1,13 @@
-import { Geolocation } from "@capacitor/geolocation";
-
 export async function getLocation() {
-  const coordinates = await Geolocation.getCurrentPosition();
-
-  console.log("Current position:", coordinates);
-
-  return coordinates;
+  return new Promise((resolve, reject) => {
+    navigator.geolocation.getCurrentPosition(
+      (location) => {
+        resolve(location);
+      },
+      (error) => {
+        reject(error);
+      },
+      { enableHighAccuracy: true },
+    );
+  });
 }
