@@ -2,13 +2,17 @@ import { css, html, LitElement } from "lit";
 
 export class ImageHandler extends LitElement {
     static get properties() {
-        return {};
+        return {
+            currentImage: { type: Object },
+        };
     }
 
     constructor() {
         super();
         this.videoHeight = 0;
         this.videoWidth = 400;
+
+        this.currentImage = undefined;
 
         this.isDrawing = false;
 
@@ -39,7 +43,9 @@ export class ImageHandler extends LitElement {
         this.video.addEventListener(
             "canplay",
             ev => {
+                const width = 400;
                 this.videoHeight = (this.video.videoHeight / this.video.videoWidth) * this.videoWidth;
+                //this.videoHeight = 0.75 * width;
 
                 this.video.setAttribute("width", this.videoWidth + "");
                 this.video.setAttribute("height", this.videoHeight + "");
@@ -74,7 +80,21 @@ export class ImageHandler extends LitElement {
 
             const data = canvas.toDataURL("image/png");
             photo.setAttribute("src", data);
+            this.currentImage = data;
         }
+    }
+
+    clearPhoto() {
+        this.currentImage = undefined;
+        this.drawedRect = undefined;
+
+        this.clearDrawing();
+    }
+
+    clearDrawing() {
+        this.isDrawing = false;
+        this.drawingCanvas.getContext("2d").clearRect(0, 0, this.drawingCanvas.width, this.drawingCanvas.height);
+        this.imageCanvas.getContext("2d").clearRect(0, 0, this.imageCanvas.width, this.imageCanvas.height);
     }
 
     /**
@@ -150,7 +170,7 @@ export class ImageHandler extends LitElement {
 
         const ctx = this.drawingCanvas.getContext("2d");
 
-        ctx.clearRect(0, 0, this.imageCanvas.width, this.imageCanvas.height);
+        ctx.clearRect(0, 0, this.drawingCanvas.width, this.drawingCanvas.height);
         ctx.strokeRect(this.rectStart.x, this.rectStart.y, width, height);
     }
 
@@ -196,10 +216,15 @@ export class ImageHandler extends LitElement {
         return html`
             <div class="camera">
                 <video>Loading video source...</video>
-                <button @click=${this.takePhoto}>Take a photo</button>
+
+                <div class="camera-controls">
+                    ${this.currentImage
+                        ? html` <button @click=${this.clearPhoto}>Clear photo</button> `
+                        : html` <button @click=${this.takePhoto}>Take a photo</button> `}
+                </div>
             </div>
 
-            <div class="editing-canvas">
+            <div class="editing-canvas" ?hidden=${!this.currentImage}>
                 <canvas id="img-canvas"></canvas>
                 <canvas
                     id="drawing-canvas"
@@ -220,14 +245,39 @@ export class ImageHandler extends LitElement {
 
     static get styles() {
         return css`
-            .editing-canvas {
+            :host {
+                display: flex;
+                width: 100%;
                 position: relative;
+            }
+
+            .camera {
+                display: flex;
+                width: 100%;
+            }
+
+            .camera-controls {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .editing-canvas {
+                position: absolute;
+                top: 0;
             }
 
             .editing-canvas * {
                 position: absolute;
                 top: 0;
                 left: 0;
+            }
+
+            canvas {
+                touch-action: none;
+            }
+
+            *[hidden] {
+                visibility: hidden;
             }
         `;
     }
