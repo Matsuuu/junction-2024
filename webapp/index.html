@@ -19,7 +19,16 @@
 
         <h2>Wherehouse</h2>
         <div class="views">
-            <image-handler></image-handler>
+            <sl-tab-group>
+              <sl-tab slot="nav" panel="map">Map</sl-tab>
+              <sl-tab slot="nav" panel="photos">Photos</sl-tab>
+
+                <sl-tab-panel name="map"><ifc-element></ifc-element></sl-tab-panel>
+                <sl-tab-panel name="photos">
+                    <image-handler></image-handler>
+                </sl-tab-panel>
+            </sl-tab-group>
+            
         </div>
        
         <location-watcher></location-watcher>

@@ -22,7 +22,35 @@ const components = new Components();
 const worlds = components.get(Worlds);
 const world = worlds.create();
 
-const CUBE_START_POINT = { x: 12, y: CUBE_SIZE * 2.5, z: 1 };
+// const CUBE_START_POINT = { x: 12, y: CUBE_SIZE * 2.5, z: 1 };
+const CUBE_START_POINT = { x: 0, y: 2, z: 0 };
+const COORDINATE_ZERO_POINT = { lat: 60.16145136865442, lng: 24.902894420257443 };
+
+/**
+ * @typedef Coordinates
+ * @prop { number } lat
+ * @prop { number } lng
+ * */
+
+/**
+ * @typedef Geometry
+ * @prop { number } x
+ * @prop { number } z
+ * */
+
+function coordinateOffsetToGeometryOffset(coordinates) {
+    const offset = {
+        lat: COORDINATE_ZERO_POINT.lat - coordinates.lat,
+        lng: COORDINATE_ZERO_POINT.lng - coordinates.lng,
+    };
+
+    const MODIFIER = 40000;
+    return {
+        x: offset.lng * MODIFIER,
+        z: offset.lat * MODIFIER,
+    };
+}
+
 const cube = new Mesh(boxGeometry, cubeMaterial);
 
 const fragments = components.get(FragmentsManager);
@@ -69,9 +97,16 @@ export class IfcElement extends LitElement {
 
         world.camera.controls.fitToSphere(fragmentBbox.getMesh(), true);
 
-        cube.position.x = CUBE_START_POINT.x;
-        cube.position.y = CUBE_START_POINT.y;
-        cube.position.z = CUBE_START_POINT.z;
+        const cubePosition = CUBE_START_POINT;
+
+        const offset = coordinateOffsetToGeometryOffset({ lat: 60.16175136865442, lng: 24.902894420257443 });
+        console.log("Off", offset);
+        cubePosition.z += offset.z;
+        cubePosition.x += offset.x;
+
+        cube.position.x = cubePosition.x;
+        cube.position.y = cubePosition.y;
+        cube.position.z = cubePosition.z;
         const cubeReferencePosition = { ...cube.position };
 
         const hoverMaterial = new MeshStandardMaterial({ color: "#b9ce9f" });
@@ -108,8 +143,8 @@ export class IfcElement extends LitElement {
             const { location, diff } = event.detail;
 
             const MULTIPLIER = 10000;
-            cube.position.z = cubeReferencePosition.z + diff.lat * MULTIPLIER;
-            cube.position.x = cubeReferencePosition.x + diff.lng * MULTIPLIER;
+            // cube.position.z = cubeReferencePosition.z + diff.lat * MULTIPLIER;
+            // cube.position.x = cubeReferencePosition.x + diff.lng * MULTIPLIER;
         });
     }
 
@@ -118,7 +153,18 @@ export class IfcElement extends LitElement {
     }
 
     static get styles() {
-        return css``;
+        return css`
+            :host {
+                display: flex;
+                width: 100%;
+                height: 100%;
+            }
+
+            #thatopen-container {
+                width: 100%;
+                height: 100%;
+            }
+        `;
     }
 }
 

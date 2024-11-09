@@ -2,8 +2,8 @@ import "./location-watcher.js";
 import "./image-handler.js";
 import "./ifc-element.js";
 import { sendDiagnostics } from "./diag.js";
-import { FILE_API_URL } from "./request.js";
 import { registerIconLibrary, setBasePath } from "@shoelace-style/shoelace";
+import "@shoelace-style/shoelace/dist/shoelace.js";
 
 window.__DIAG = {};
 
