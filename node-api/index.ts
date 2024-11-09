@@ -28,6 +28,12 @@ app.post("/submit", async (req, res) => {
     res.send();
 });
 
+app.get("/items", async (req, res) => {
+    const items = await db.selectFrom("inventory").selectAll().execute();
+
+    res.send({ items });
+});
+
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`);
 });

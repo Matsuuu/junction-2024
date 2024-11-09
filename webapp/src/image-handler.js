@@ -286,6 +286,10 @@ export class ImageHandler extends LitElement {
             return acc;
         }, {});
 
+        const timestamp = new Date();
+        const scheduled = timestamp;
+        scheduled.setFullYear(scheduled.getFullYear() + 1);
+
         const payload = {
             sku: formData.get("sku"),
             name: formData.get("name"),
@@ -293,6 +297,8 @@ export class ImageHandler extends LitElement {
             lon: window.__LOCATION_WATCHER.position.lng,
             status: "available",
             metadata,
+            last_maintained: timestamp.toUTCString(),
+            next_scheduled_maintenance: scheduled,
         };
 
         const res = await fetch(API_URL() + "/submit", {
