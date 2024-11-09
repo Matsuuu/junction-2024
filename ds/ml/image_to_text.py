@@ -75,9 +75,10 @@ def image_to_text(image_path: str,
             h = h
 
     # sys.exit()
+    pad_color = img[0,0,:]
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-    _, thresh1 = cv2.threshold(gray, 0, 255, cv2.THRESH_OTSU | cv2.THRESH_BINARY_INV)
+    _, thresh1 = cv2.threshold(gray, 0, 255, cv2.THRESH_OTSU | cv2.THRESH_TRUNC)
 
     im2 = img.copy()
 
@@ -114,11 +115,12 @@ def image_to_text(image_path: str,
     print("DUMP")
     print(text.strip())
 
-    cv2.imwrite("im2.jpg", im2)
     show_wait_close(cv2.resize(im2, (800,800)))
 
     logger.info(f"Uploading {image_path.split('/')[-1]} results to DB")
     upload_imagetext_to_db(image_path.split("/")[-1], info_dict, image_path)
+
+    return info_dict
 
 
 
