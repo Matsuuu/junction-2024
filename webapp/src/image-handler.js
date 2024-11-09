@@ -325,10 +325,12 @@ export class ImageHandler extends LitElement {
                   `
                 : html`
                       <form class="image-results" @submit=${this.onFoundResultsSubmit}>
+                          <p>Required information:</p>
+                          <sl-input label="Name" type="text" name="name"></sl-input>
                           <p>Found matches:</p>
                           ${[...Object.entries(this.imageResults.foundResults)].map(
                               ([key, value]) => html`
-                                  <sl-input label="${key}" type="text" value="${value}"></sl-input>
+                                  <sl-input label="${key}" name="${key}" type="text" value="${value}"></sl-input>
                               `,
                           )}
 
@@ -338,7 +340,7 @@ export class ImageHandler extends LitElement {
                               other => html` <sl-input type="text" value="${other}"></sl-input> `,
                           )}
 
-                          <sl-button type="submit" label="" variant="primary">Submit</sl-button>
+                          <sl-button type="submit" variant="primary">Submit</sl-button>
                       </form>
                   `}
         `;
@@ -420,10 +422,15 @@ export class ImageHandler extends LitElement {
 
             .image-results p {
                 font-weight: bold;
+                margin: 0 0 1rem 0;
             }
 
             .image-results input {
                 font-size: 1.6rem;
+            }
+
+            .image-results sl-button {
+                margin-top: 1rem;
             }
 
             sl-input[type="file"]::part(input) {
