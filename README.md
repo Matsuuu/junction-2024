@@ -23,7 +23,7 @@ Other end of the building:
 lat: 60.1620019
 lng: 24.9027815
 
-
+```
 {
     "others": [
         "Mukulaku ja 3, FIN-04300 Tuusula"
@@ -35,4 +35,5 @@ lng: 24.9027815
     "Konetunnus": " TK1",
     "Ilmavirta (m3/s)": " 7.2"
 }
+```
 
